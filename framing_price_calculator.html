@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Framing Price Calculator</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; max-width: 600px; margin: auto; }
+    label, select, input { display: block; margin: 10px 0; }
+    .result { margin-top: 20px; font-weight: bold; }
+  </style>
+</head>
+<body>
+  <h1>Framing Price Calculator</h1>
+
+  <label for="width">Width (cm):</label>
+  <input type="number" id="width" min="10" placeholder="e.g., 30">
+
+  <label for="height">Height (cm):</label>
+  <input type="number" id="height" min="10" placeholder="e.g., 40">
+
+  <label for="frame">Frame Type:</label>
+  <select id="frame">
+    <option value="basic">Basic</option>
+    <option value="mid">Mid-range</option>
+    <option value="premium">Premium</option>
+  </select>
+
+  <label for="mount">Mount:</label>
+  <select id="mount">
+    <option value="none">None</option>
+    <option value="single">Single</option>
+    <option value="double">Double</option>
+  </select>
+
+  <label for="glass">Glass Type:</label>
+  <select id="glass">
+    <option value="standard">Standard</option>
+    <option value="nonreflective">Non-reflective</option>
+  </select>
+
+  <button onclick="calculatePrice()">Calculate Price</button>
+
+  <div class="result" id="result"></div>
+
+  <script src="parameters.js"></script>
+  <script>
+    function calculatePrice() {
+      const width = parseFloat(document.getElementById('width').value);
+      const height = parseFloat(document.getElementById('height').value);
+      const frame = document.getElementById('frame').value;
+      const mount = document.getElementById('mount').value;
+      const glass = document.getElementById('glass').value;
+
+      if (isNaN(width) || isNaN(height) || width <= 0 || height <= 0) {
+        document.getElementById('result').innerHTML = 'Please enter valid dimensions.';
+        return;
+      }
+
+      const perimeter = 2 * (width + height) / 100;
+      const area = (width * height) / 10000;
+
+      const frameCost = perimeter * parameters.frameRates[frame];
+
+      let mountPrice = 0;
+      if (mount === 'single') mountPrice = area * parameters.mountRates.single;
+      else if (mount === 'double') mountPrice = area * parameters.mountRates.double;
+
+      const glassPrice = glass === 'standard' ? area * parameters.glassRates.standard : area * parameters.glassRates.nonreflective;
+
+      const tradePrice = frameCost + mountPrice + glassPrice + parameters.labour + parameters.collection;
+      const retailPrice = tradePrice * parameters.markup;
+
+      document.getElementById('result').innerHTML =
+        `Frame perimeter: ${perimeter.toFixed(2)} m<br>` +
+        `Frame cost: £${frameCost.toFixed(2)}<br>` +
+        `Mount cost: £${mountPrice.toFixed(2)}<br>` +
+        `Glass cost: £${glassPrice.toFixed(2)}<br>` +
+        `Labour: £${parameters.labour.toFixed(2)}<br>` +
+        `Collection: £${parameters.collection.toFixed(2)}<br><br>` +
+        `Trade Price: £${tradePrice.toFixed(2)}<br>` +
+        `Retail Price: £${retailPrice.toFixed(2)}`;
+    }
+  </script>
+</body>
+</html>
